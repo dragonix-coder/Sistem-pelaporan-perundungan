@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Efek transisi saat kursor diarahkan ke kartu / tombol */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Karena shadow dihilangkan dari class Tailwind, kita tambahkan sedikit efek saat di hover saja */
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Menandai menu yang sedang aktif di navbar */
+.nav-btn.active {
+    color: #0ddbce;
+    font-weight: bold;
+    border-bottom: 2px solid #0ddbce;
+    padding-bottom: 2px;
+}
+
+/* Efek munculnya halaman (fade-in) */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-section:not(.hidden) {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Animasi untuk Modal Pop-up */
+#bullyingModal:not(.hidden) {
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}

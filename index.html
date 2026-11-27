@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGAP-BULLY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen font-sans">
+
+    <!-- navbar -->
+    <nav class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- Logo Kiri -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
+                <img src="logo smp 6.png" alt="Logo SMPN 6" class="h-10 w-10 object-contain">
+                <span class="font-bold text-lg">SIGAP-BULLY</span>
+            </div>
+
+            <!-- Menu Navigasi -->
+            <div class="space-x-2 md:space-x-4 font-bold text-sm">
+                <button onclick="showPage('home')" class="nav-btn hover:text-blue-400 transition">Home</button>
+                <button onclick="showPage('lapor')" class="nav-btn hover:text-blue-400 transition">Lapor</button>
+                <button onclick="showPage('status')" class="nav-btn hover:text-blue-400 transition">CekStatus</button>
+                <button onclick="showPage('about')" class="nav-btn hover:text-blue-400 transition">About</button>
+            </div>
+
+            <!-- Logo Kanan (UPS) -->
+            <img src="ups.png" alt="Logo UPS" class="h-10 w-10 object-contain">
+        </div>
+    </nav>
+
+    <!-- HALAMAN HOME -->
+    <section id="page-home" class="page-section flex-grow">
+        <!-- Hero Section dengan Foto Sekolah -->
+        <header class="relative w-full h-[400px]">
+            <img src="background web.jpeg" alt="Guru SMPN 6 Tegal" class="w-full h-full object-cover">
+            <div
+                class="absolute inset-0 bg-blue-900 bg-opacity-75 flex flex-col items-center justify-center text-center p-4">
+                <h1 class="text-3xl md:text-5xl font-bold text-white mb-4">Sistem Informasi Gerakan Aman dan Peduli
+                    Bullying</h1>
+                <p class="text-white text-lg md:text-xl max-w-3xl">Platform pelaporan digital SMPN 6 Tegal. Jembatan
+                    aman antara siswa dan Guru BK.</p>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto py-12 px-4">
+            <!-- Judul bisa diklik -->
+            <div class="text-center mb-8">
+                <!-- Class trigger-modal menggantikan onclick -->
+                <h2
+                    class="trigger-modal text-2xl font-bold text-gray-800 border-b-2 border-blue-900 pb-2 inline-block cursor-pointer hover:text-blue-700 transition">
+                    APA SAJA JENIS BULLYING?
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <!-- Kartu Fisik -->
+                <div class="trigger-modal bg-white p-6 rounded-xl card-hover cursor-pointer">
+                    <h3 class="text-xl font-bold mb-2 text-red-600">1. Fisik</h3>
+                    <p class="text-gray-600 text-sm">Tindakan kekerasan fisik seperti dipukul, ditendang, didorong, atau
+                        barang dirampas.</p>
+                </div>
+                <!-- Kartu Verbal -->
+                <div class="trigger-modal bg-white p-6 rounded-xl card-hover cursor-pointer">
+                    <h3 class="text-xl font-bold mb-2 text-yellow-600">2. Verbal</h3>
+                    <p class="text-gray-600 text-sm">Perkataan menyakitkan seperti ejekan, hinaan, ancaman, atau
+                        panggilan yang merendahkan.</p>
+                </div>
+                <!-- Kartu Cyber -->
+                <div class="trigger-modal bg-white p-6 rounded-xl card-hover cursor-pointer">
+                    <h3 class="text-xl font-bold mb-2 text-purple-700">3. Cyberbullying</h3>
+                    <p class="text-gray-600 text-sm">Perundungan di dunia maya seperti sadap-menyadap, teror pesan, atau
+                        menyebar foto/video.</p>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- HALAMAN LAPOR -->
+    <section id="page-lapor" class="page-section hidden justify-center p-4 py-10">
+        <div class="bg-white p-8 w-full max-w-2xl border border-gray-200">
+            <h2 class="text-2xl font-bold mb-6 border-b pb-4">Formulir Pelaporan</h2>
+
+            <form id="formLapor" class="space-y-5">
+                <!-- Anonim -->
+                <div class="flex items-center bg-blue-50 p-4 border border-blue-200">
+                    <input type="checkbox" id="isAnonim" class="w-6 h-6 mr-3 cursor-pointer text-blue-600 rounded">
+                    <div>
+                        <label for="isAnonim" class="font-bold text-blue-900 cursor-pointer">Sembunyikan Identitas
+                            (Anonim)</label>
+                        <p class="text-sm text-gray-500">Centang jika kamu tidak ingin namamu dicatat.</p>
+                    </div>
+                </div>
+
+                <!-- Data Diri -->
+                <div id="dataDiri" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="nama"
+                            class="w-full border-gray-300 p-3 border focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Masukkan namamu">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Kelas</label>
+                        <!-- Dropdown Kelas 7A-9H -->
+                        <select id="kelas"
+                            class="w-full border-gray-300 p-3 border focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <option value="disabled selected">-- Pilih Kelas --</option>
+                            <optgroup label="Kelas 7">
+                                <option value="7A">7A</option>
+                                <option value="7B">7B</option>
+                                <option value="7C">7C</option>
+                                <option value="7D">7D</option>
+                                <option value="7E">7E</option>
+                                <option value="7F">7F</option>
+                                <option value="7G">7G</option>
+                                <option value="7H">7H</option>
+                            </optgroup>
+                            <optgroup label="Kelas 8">
+                                <option value="8A">8A</option>
+                                <option value="8B">8B</option>
+                                <option value="8C">8C</option>
+                                <option value="8D">8D</option>
+                                <option value="8E">8E</option>
+                                <option value="8F">8F</option>
+                                <option value="8G">8G</option>
+                                <option value="8H">8H</option>
+                            </optgroup>
+                            <optgroup label="Kelas 9">
+                                <option value="9A">9A</option>
+                                <option value="9B">9B</option>
+                                <option value="9C">9C</option>
+                                <option value="9D">9D</option>
+                                <option value="9E">9E</option>
+                                <option value="9F">9F</option>
+                                <option value="9G">9G</option>
+                                <option value="9H">9H</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Kategori Bullying (Checkbox) -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Kategori Bullying <span
+                            class="text-xs font-normal text-gray-500">(Bisa pilih lebih dari satu)</span></label>
+                    <div class="flex flex-col space-y-2 bg-gray-50 p-4 border border-gray-300">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="kategori" value="Fisik"
+                                class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer">
+                            <span class="ml-3 text-gray-700 font-medium text-sm">Fisik (Dipukul, ditendang, dll)</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="kategori" value="Verbal"
+                                class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer">
+                            <span class="ml-3 text-gray-700 font-medium text-sm">Verbal (Ejekan, hinaan, dll)</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="kategori" value="Cyberbullying"
+                                class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer">
+                            <span class="ml-3 text-gray-700 font-medium text-sm">Cyberbullying (Chat, Medsos,
+                                dll)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Ceritakan Kronologinya</label>
+                    <textarea id="cerita" rows="4"
+                        class="w-full border-gray-300 p-3 border focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Ceritakan apa yang terjadi secara detail..."></textarea>
+                </div>
+
+                <!-- Upload Bukti (Multiple) -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Upload Bukti (Bisa lebih dari 1)</label>
+                    <div
+                        class="w-full h-32 border-2 border-dashed border-gray-400 flex flex-col rounded-lg items-center justify-center bg-gray-50 hover:bg-gray-100 transition cursor-pointer relative">
+                        <p class="text-gray-500 font-medium text-sm">Klik untuk pilih Gambar / Video</p>
+                        <input type="file" id="inputBukti" multiple accept="image/*,video/*"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    </div>
+                    <div id="filePreview" class="mt-2 text-sm text-blue-600 font-medium"></div>
+                </div>
+
+                <button type="submit" id="btnKirim"
+                    class="w-full bg-blue-600 text-white rounded-lg font-bold py-4 hover:bg-blue-700 transition">
+                    Kirim Laporan
+                </button>
+
+                <!-- Kotak Hasil Tiket -->
+                <div id="hasilTiket" class="hidden mt-6 p-6 bg-green-50 border-2 border-green-500 text-center">
+                    <h3 class="text-xl font-bold text-green-800 mb-2">Laporan Berhasil Dikirim!</h3>
+                    <p class="text-gray-700 mb-4">Simpan kode tiket ini untuk mengecek status:</p>
+                    <div id="kodeTiketTampil"
+                        class="text-3xl font-mono font-bold bg-white p-3 border border-green-300 text-green-700 mb-4">
+                        BULLY-XXXX</div>
+                    <button type="button" onclick="showPage('status')"
+                        class="bg-green-600 text-white px-6 py-2 font-bold hover:bg-green-700">Cek Status
+                        Sekarang</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ================= HALAMAN CEK STATUS ================= -->
+    <section id="page-status" class="page-section hidden justify-center p-4 py-10">
+        <div class="bg-white p-8 w-full max-w-lg border border-gray-200">
+            <h2 class="text-2xl font-bold mb-2 text-gray-800 text-center">Cek Status Laporan</h2>
+            <p class="text-gray-500 text-center mb-6 text-sm">Masukkan Kode Tiket yang kamu dapatkan.</p>
+
+            <form id="formStatus" class="flex flex-col space-y-4">
+                <input type="text" id="inputTiket" required
+                    class="w-full border-gray-300 p-4 border focus:ring-blue-500 focus:border-blue-500 text-center rounded-lg font-mono font-bold text-lg uppercase"
+                    placeholder="BULLY-1234">
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white rounded-lg font-bold py-3 hover:bg-blue-700 transition">
+                    Cek Status
+                </button>
+            </form>
+
+            <div id="hasilStatus" class="hidden mt-8 p-6 bg-blue-50 border border-blue-200">
+                <p class="text-sm text-gray-600 mb-2">Kode Tiket: <span id="tampilKode"
+                        class="font-bold text-gray-900"></span></p>
+                <p class="text-sm text-gray-600 mb-2">Status Penanganan:</p>
+                <div class="bg-yellow-100 text-yellow-800 font-bold px-4 py-2 inline-block">
+                    <span id="tampilStatus">-</span>
+                </div>
+                <div class="mt-4 pt-4 border-t border-blue-200">
+                    <p class="text-sm font-bold text-gray-700">Pesan dari Guru BK:</p>
+                    <p id="pesanBK" class="text-sm text-gray-600 italic">-</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= HALAMAN ABOUT ================= -->
+    <section id="page-about" class="page-section hidden flex-grow max-w-4xl mx-auto py-12 px-4 w-full">
+        <div class="bg-white p-8 shadow-lg space-y-6">
+            <h1 class="text-3xl font-bold text-blue-900 border-b pb-4">Tentang SIGAP-BULLY</h1>
+
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Apa itu SIGAP-BULLY?</h3>
+                <p class="text-gray-600 leading-relaxed">SIGAP-BULLY (Sistem Informasi Gerakan Aman dan Peduli Bullying)
+                    adalah platform digital yang dirancang khusus untuk mempermudah siswa-siswi SMPN 6 Tegal dalam
+                    melaporkan tindakan perundungan secara aman dan rahasia.</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Kenapa Dibuat?</h3>
+                <p class="text-gray-600 leading-relaxed">Banyak siswa enggan melapor karena takut identitasnya
+                    terbongkar. SIGAP-BULLY hadir sebagai jembatan aman tanpa rasa takut.</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Manfaat</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                    <li>Siswa dapat melapor secara <strong>Anonim</strong> (tanpa nama).</li>
+                    <li>Guru BK dapat memantau tingkat keparahan bullying secara terstruktur.</li>
+                    <li>Meminimalisir kasus bullying yang tidak tertangani.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL POP-UP MATERI & VIDEO -->
+    <div id="bullyingModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative p-6 md:p-8">
+            <!-- Tombol Close -->
+            <button id="closeModalBtn"
+                class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-3xl font-bold">&times;</button>
+
+            <h2 class="font-bold text-center border-b pb-4 text-xl">Materi singkat tentang Bullying</h2>
+
+            <!-- KONTEN MATERI -->
+            <div class="space-y-6 text-gray-700 text-sm md:text-base leading-relaxed mt-4">
+
+                <!-- 1. Fisik -->
+                <div>
+                    <h3 class="font-bold text-lg mb-2">1. Perundungan Fisik (Physical Bullying)</h3>
+                    <p class="mb-2">Terjadi ketika seseorang menyakiti tubuh atau merusak barang milik orang lain secara
+                        langsung. Jenis ini paling mudah terlihat karena sering meninggalkan bekas luka atau kerusakan
+                        barang.</p>
+                    <p class="font-bold mb-1">Contoh di sekolah:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Memukul, menendang, mendorong, mencubit, atau menjegal kaki teman.</li>
+                        <li>Meludahi atau mengunci teman di dalam ruangan/kamar mandi.</li>
+                        <li>Memalak (meminta uang/barang secara paksa), menyembunyikan, atau merusak tas, buku, dan alat
+                            tulis.</li>
+                    </ul>
+                </div>
+
+                <!-- 2. Verbal -->
+                <div>
+                    <h3 class="font-bold text-lg mb-2">2. Perundungan Verbal (Verbal Bullying)</h3>
+                    <p class="mb-2">Menggunakan kata-kata untuk menghina, merendahkan, atau mempermalukan orang lain.
+                        Sering kali pelaku berdalih "cuma bercanda", padahal ucapan tersebut sangat melukai perasaan dan
+                        mental korban.</p>
+                    <p class="font-bold mb-1">Contoh di sekolah:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Mengejek bentuk fisik (body shaming), warna kulit, cara bicara, atau kondisi keluarga.</li>
+                        <li>Memanggil teman dengan julukan buruk atau nama orang tua sebagai bahan olok-olok.</li>
+                        <li>Menyebarkan gosip bohong, memfitnah, atau mengancam teman secara langsung.</li>
+                    </ul>
+                </div>
+
+                <!-- 3. Cyber -->
+                <div>
+                    <h3 class="font-bold text-lg mb-2">3. Perundungan Siber (Cyberbullying)</h3>
+                    <p class="mb-2">Dilakukan lewat media digital (WhatsApp, Instagram, TikTok, game online). Dampaknya
+                        bisa sangat berat karena terjadi 24 jam dan jejak digitalnya mudah menyebar.</p>
+                    <p class="font-bold mb-1">Contoh di kalangan pelajar:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Mengirim pesan bernada ancaman, hinaan, atau teror lewat chat pribadi/grup.</li>
+                        <li>Menyebarkan foto atau video memalukan teman tanpa izin (dijadikan stiker/meme).</li>
+                        <li>Sengaja mengeluarkan atau mengucilkan teman dari grup pertemanan daring, komentar jahat di
+                            medsos.</li>
+                    </ul>
+                </div>
+
+                <!-- Tabel Perbedaan -->
+                <div class="overflow-x-auto mt-6">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="font-bold text-center">
+                                <td class="p-2 border">Aspek</td>
+                                <td class="p-2 border">Fisik</td>
+                                <td class="p-2 border">Verbal</td>
+                                <td class="p-2 border">Cyberbullying</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-2 border">Media</td>
+                                <td class="p-2 border">Kontak fisik & barang</td>
+                                <td class="p-2 border">Ucapan langsung</td>
+                                <td class="p-2 border">Ponsel, medsos, game</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 border">Bukti</td>
+                                <td class="p-2 border">Memar, luka, barang rusak</td>
+                                <td class="p-2 border">Kesaksian, perubahan emosi</td>
+                                <td class="p-2 border">Screenshot & tautan</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 border">Dampak</td>
+                                <td class="p-2 border">Cedera fisik & rasa takut</td>
+                                <td class="p-2 border">Hilang percaya diri</td>
+                                <td class="p-2 border">Malu & cemas berlebih</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Langkah -->
+                <div>
+                    <h3 class="font-bold text-lg mb-2 mt-4">Apa yang Harus Kamu Lakukan?</h3>
+                    <p class="font-bold">Jika kamu menjadi korban:</p>
+                    <ul class="list-disc ml-5 mb-3">
+                        <li>Jangan diam dan jangan menyalahkan diri sendiri.</li>
+                        <li>Simpan bukti (screenshot chat/unggahan) sebelum dihapus.</li>
+                        <li>Cerita kepada orang dewasa yang dipercaya (Guru BK, Wali Kelas, TPPK, atau Orang Tua).</li>
+                    </ul>
+                    <p class="font-bold">Jika kamu melihat teman dirundung:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Jangan ikut tertawa atau menyebarkan video/stiker ejekan.</li>
+                        <li>Temani korban dan ajak menjauh dari pelaku.</li>
+                        <li>Bantu laporkan kejadian ke guru atau pihak sekolah.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- VIDEO DI BAGIAN PALING BAWAH -->
+            <div class="mt-8 border-t pt-6">
+                <h3 class="text-xl font-bold text-center mb-4">Tonton Video Edukasi Berikut:</h3>
+                <div
+                    class="relative w-full max-w-2xl mx-auto aspect-video overflow-hidden shadow-lg border-2 border-gray-200">
+                    <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/vsLPEutCqpA"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-blue-900 text-white text-center p-4 mt-auto">
+        <p>&copy; 2026 SIGAP-BULLY</p>
+    </footer>
+    <!-- File JavaScript-->
+    <script src="script.js"></script>
+</body>
+
+</html>

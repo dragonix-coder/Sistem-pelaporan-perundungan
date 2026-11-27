@@ -1,0 +1,717 @@
+<!-- path: admin.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard BK - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .bg-sidebar { background-color: #0b132b; }
+    .bg-sidebar-active { background-color: #2563eb; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- HALAMAN LOGIN -->
+  <div id="login-page" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-[100] p-4">
+    <div class="bg-white p-8 w-full max-w-md">
+      <div class="text-center mb-8">
+        <img src="logo smp 6.png" alt="Logo SMPN 6" class="h-16 w-16 object-contain mx-auto mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">Login Portal BK</h2>
+        <p class="text-gray-500 text-sm mt-1">Sistem Pelaporan Perundungan SMPN 6 Tegal</p>
+      </div>
+      
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-bold text-gray-700 mb-1">Username</label>
+          <input type="text" id="username" required class="w-full border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan username">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 mb-1">Password</label>
+          <input type="password" id="password" required class="w-full border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan password">
+        </div>
+        <button type="submit" class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg hover:bg-blue-800 transition shadow-md">
+          Masuk ke Dashboard
+        </button>
+        <p id="loginError" class="text-red-500 text-sm text-center hidden font-semibold">Username atau Password salah!</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- APLIKASI UTAMA -->
+  <div id="main-app" class="hidden flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-sidebar text-white flex flex-col justify-between shrink-0">
+      <div>
+        <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-800">
+          <img src="logo smp 6.png" alt="Logo SMPN 6" class="h-8 w-8 object-contain">
+          <span class="font-bold text-lg tracking-wide">Portal BK</span>
+        </div>
+
+        <div class="px-6 py-4 flex items-center gap-3 border-b border-gray-800/60">
+          <div class="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center font-bold text-sm">
+            GB
+          </div>
+          <div>
+            <h4 class="font-semibold text-sm leading-tight">Guru BK</h4>
+            <p class="text-xs text-gray-400">Akses penuh</p>
+          </div>
+        </div>
+
+        <nav class="mt-4 px-3 space-y-1">
+          <button id="nav-dashboard" onclick="switchTab('dashboard')" 
+                  class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition bg-sidebar-active text-white">
+            <i class="fa-solid fa-chart-pie w-5"></i>
+            <span>Dashboard</span>
+          </button>
+
+          <button id="nav-laporan" onclick="switchTab('laporan')" 
+                  class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-gray-300 hover:bg-gray-800 hover:text-white">
+            <i class="fa-solid fa-inbox w-5"></i>
+            <span>Laporan Masuk</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-gray-800">
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 text-sm font-semibold py-2 transition">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- KONTEN UTAMA -->
+    <div class="flex-1 flex flex-col h-full overflow-y-auto">
+
+      <!-- TOPBAR -->
+      <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-4">
+          <button class="text-gray-600 hover:text-gray-900 focus:outline-none">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
+          <h1 id="page-title" class="text-xl font-bold text-gray-800">Dashboard BK</h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span id="server-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-900 text-white">
+            <span id="server-status-dot" class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span id="server-status-text">Server Connected</span>
+          </span>
+
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input type="text" id="input-search" oninput="renderTable()" placeholder="Cari Kode Tiket, Nama..." 
+                   class="pl-9 pr-4 py-1.5 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-60">
+          </div>
+
+          <button onclick="loadDataFromAPI()" class="flex items-center gap-2 text-blue-600 text-sm font-medium hover:text-blue-800 transition">
+            <i class="fa-solid fa-rotate-right text-xs"></i>
+            <span>Refresh Data</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="p-8 space-y-6 flex-1">
+
+        <!-- SECTION DASHBOARD -->
+        <section id="section-dashboard" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 border border-gray-100 flex justify-between items-start">
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Laporan Masuk</p>
+                <h3 id="stat-total" class="text-3xl font-extrabold text-gray-800 mt-2">0</h3>
+                <p class="text-xs font-semibold text-green-600 mt-2 flex items-center gap-1">
+                  <i class="fa-solid fa-arrow-up"></i> Terakumulasi di Sistem
+                </p>
+              </div>
+              <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                <i class="fa-solid fa-folder-closed text-xl"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 border border-gray-100 flex justify-between items-start">
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Menunggu Tinjauan</p>
+                <h3 id="stat-menunggu" class="text-3xl font-extrabold text-amber-500 mt-2">0</h3>
+                <p class="text-xs font-semibold text-amber-600 mt-2 flex items-center gap-1">
+                  <i class="fa-solid fa-clock"></i> Perlu Tindakan Segera
+                </p>
+              </div>
+              <div class="p-3 bg-amber-50 rounded-lg text-amber-500">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 border border-gray-100 flex justify-between items-start">
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Selesai Ditangani</p>
+                <h3 id="stat-selesai" class="text-3xl font-extrabold text-green-600 mt-2">0</h3>
+                <p class="text-xs font-semibold text-green-600 mt-2 flex items-center gap-1">
+                  <i class="fa-solid fa-circle-check"></i> Respon BK Terkirim
+                </p>
+              </div>
+              <div class="p-3 bg-green-50 rounded-lg text-green-600">
+                <i class="fa-solid fa-user-check text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white p-6 border border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                  <i class="fa-solid fa-chart-pie text-blue-600"></i>
+                 Data Bullying
+                </h3>
+              </div>
+              <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4">
+                <div class="w-56 h-56 relative">
+                  <canvas id="bullyingDonutChart"></canvas>
+                </div>
+                <div class="space-y-4 w-full md:w-64">
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-red-50">
+                    <span class="flex items-center gap-2 text-sm font-semibold text-red-700">
+                      <span class="w-3 h-3 rounded-full bg-red-500"></span> Bullying Fisik
+                    </span>
+                    <span id="pct-fisik" class="font-bold text-red-700">0%</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-amber-50">
+                    <span class="flex items-center gap-2 text-sm font-semibold text-amber-700">
+                      <span class="w-3 h-3 rounded-full bg-amber-500"></span> Bullying Verbal
+                    </span>
+                    <span id="pct-verbal" class="font-bold text-amber-700">0%</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-purple-50">
+                    <span class="flex items-center gap-2 text-sm font-semibold text-purple-700">
+                      <span class="w-3 h-3 rounded-full bg-purple-500"></span> Cyberbullying
+                    </span>
+                    <span id="pct-cyber" class="font-bold text-purple-700">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 border border-gray-100 flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-6">
+                  <i class="fa-solid fa-list-check text-blue-600"></i>
+                  KATEGORI KASUS
+                </h3>
+                
+                <div class="space-y-5">
+                  <div>
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                      <span class="text-red-600">Perundungan Fisik</span>
+                      <span id="prog-val-fisik" class="text-gray-700">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                      <div id="prog-bar-fisik" class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                      <span class="text-amber-600">Perundungan Verbal</span>
+                      <span id="prog-val-verbal" class="text-gray-700">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                      <div id="prog-bar-verbal" class="bg-amber-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                      <span class="text-purple-600">Cyberbullying</span>
+                      <span id="prog-val-cyber" class="text-gray-700">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                      <div id="prog-bar-cyber" class="bg-purple-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 p-3 bg-blue-50 text-blue-800 flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-blue-600 text-sm"></i>
+                <span>Data dikelompokkan otomatis berdasarkan aduan form siswa.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LAPORAN MASUK MENU -->
+        <section id="section-laporan" class="space-y-6 hidden">
+          <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            
+            <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                  <i class="fa-solid fa-inbox text-blue-600"></i> Laporan Masuk
+                </h2>
+                <p class="text-xs text-gray-500 mt-0.5">Daftar laporan perundungan dari siswa yang masuk ke sistem BK.</p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="text-xs font-bold text-gray-600">Filter Status:</label>
+                <select id="filter-status" onchange="renderTable()" class="border border-gray-300 rounded-lg text-xs px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="Semua">Semua Status</option>
+                  <option value="Menunggu Tinjauan">Menunggu Tinjauan</option>
+                  <option value="Sedang Diproses BK">Sedang Diproses BK</option>
+                  <option value="Selesai">Selesai</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-blue-600 text-white font-bold uppercase tracking-wider">
+                  <tr>
+                    <th class="px-6 py-3.5">Kode Tiket</th>
+                    <th class="px-6 py-3.5">Nama Pelapor</th>
+                    <th class="px-6 py-3.5">Kelas</th>
+                    <th class="px-6 py-3.5">Kategori</th>
+                    <th class="px-6 py-3.5">Status Penanganan</th>
+                    <th class="px-6 py-3.5">Tanggal</th>
+                    <th class="px-6 py-3.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tabel-laporan-body" class="divide-y divide-gray-100">
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL TINJAU LAPORAN -->
+  <div id="modal-tinjau" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl w-full max-w-xl overflow-hidden">
+      <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-user-gear"></i> Tinjau & Tanggapi Laporan BK
+        </h3>
+        <button onclick="closeModal()" class="text-gray-300 hover:text-white text-lg focus:outline-none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs">
+        <div class="bg-blue-50/70 rounded-lg p-4 grid grid-cols-2 gap-3 border border-blue-100">
+          <div>
+            <p class="text-gray-500 font-bold uppercase">Kode Tiket:</p>
+            <p id="modal-kode" class="text-blue-800 font-extrabold text-sm">-</p>
+          </div>
+          <div>
+            <p class="text-gray-500 font-bold uppercase">Tanggal Masuk:</p>
+            <p id="modal-tanggal" class="text-gray-800 font-semibold">-</p>
+          </div>
+          <div>
+            <p class="text-gray-500 font-bold uppercase">Nama Pelapor:</p>
+            <p id="modal-nama" class="text-gray-800 font-semibold">-</p>
+          </div>
+          <div>
+            <p class="text-gray-500 font-bold uppercase">Kelas:</p>
+            <p id="modal-kelas" class="text-gray-800 font-semibold">-</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 uppercase mb-1">Kategori Perundungan</label>
+          <span id="modal-kategori" class="bg-red-100 text-red-700 font-bold px-2.5 py-1 rounded text-xs">-</span>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 uppercase mb-1">Kronologi Kejadian (Cerita Siswa)</label>
+          <div id="modal-kronologi" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-700 min-h-[60px]">
+            -
+          </div>
+        </div>
+
+        <!-- BARU: Galeri Bukti Lampiran -->
+        <div>
+          <label class="block font-bold text-gray-700 uppercase mb-1">Bukti Lampiran (Foto/Video)</label>
+          <div id="modal-bukti" class="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[60px]">
+            -
+          </div>
+        </div>
+        <!-- /BARU -->
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Ubah Status Penanganan Kasus <span class="text-red-500">*</span></label>
+          <select id="modal-input-status" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="Menunggu Tinjauan">Menunggu Tinjauan</option>
+            <option value="Sedang Diproses BK">Sedang Diproses BK</option>
+            <option value="Selesai">Selesai</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Pesan Balasan <span class="text-red-500">*</span></label>
+          <textarea id="modal-input-pesan" rows="3" placeholder="Tuliskan pesan balasan..." 
+                    class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-end gap-3">
+        <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition text-xs">
+          Batal
+        </button>
+        <button onclick="submitTanggapan()" class="px-4 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 flex items-center gap-2 transition text-xs">
+          <i class="fa-solid fa-paper-plane"></i> Simpan & Kirim Balasan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIRMASI HAPUS PERMANEN -->
+  <div id="modal-hapus" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl w-full max-w-md overflow-hidden">
+      <div class="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Konfirmasi Hapus Laporan
+        </h3>
+        <button onclick="closeDeleteModal()" class="text-white hover:text-gray-200 text-lg focus:outline-none">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 text-xs text-gray-600 space-y-3">
+        <p class="text-sm text-gray-800 font-semibold">Apakah Anda yakin ingin menghapus laporan ini ?</p>
+        <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <p><strong>Kode Tiket:</strong> <span id="delete-target-id">-</span></p>
+          <p class="mt-1 text-[11px]">Tindakan ini akan menghapus data laporan permanen di Database.</p>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-end gap-3">
+        <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition text-xs">
+          Batal
+        </button>
+        <button onclick="executeDeletePermanently()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 flex items-center gap-2 transition text-xs">
+          <i class="fa-regular fa-trash-can"></i> Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT & REST API INTEGRATION -->
+  <script>
+    // --- MEMASTIKAN URL MENGARAH KE PORT 8000 ---
+    const API_BASE_URL = 'http://localhost:8000/api';
+    
+    let laporanList = [];
+    let activeDeleteId = null;
+    let activeReviewId = null;
+    let donutChartInstance = null;
+
+    // ==========================================
+    // LOGIKA LOGIN ADMIN
+    // ==========================================
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      if (user === 'admin' && pass === 'gurubk123') {
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('loginError').classList.add('hidden');
+        sessionStorage.setItem('isLoggedIn', 'true');
+        loadDataFromAPI(); 
+      } else {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    });
+
+    function logout() {
+      sessionStorage.removeItem('isLoggedIn');
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('login-page').classList.remove('hidden');
+      document.getElementById('loginForm').reset();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        loadDataFromAPI();
+      }
+    });
+
+    // ==========================================
+    // LOGIKA NAVIGASI & DATA
+    // ==========================================
+    function switchTab(tab) {
+      const dashSec = document.getElementById('section-dashboard');
+      const lapSec = document.getElementById('section-laporan');
+      const navDash = document.getElementById('nav-dashboard');
+      const navLap = document.getElementById('nav-laporan');
+      const pageTitle = document.getElementById('page-title');
+
+      if (tab === 'dashboard') {
+        dashSec.classList.remove('hidden');
+        lapSec.classList.add('hidden');
+        navDash.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition bg-sidebar-active text-white";
+        navLap.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-gray-300 hover:bg-gray-800 hover:text-white";
+        pageTitle.innerText = "Dashboard BK - Overview";
+      } else {
+        dashSec.classList.add('hidden');
+        lapSec.classList.remove('hidden');
+        navLap.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition bg-sidebar-active text-white";
+        navDash.className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-gray-300 hover:bg-gray-800 hover:text-white";
+        pageTitle.innerText = "Dashboard BK - Laporan Masuk";
+      }
+    }
+
+    async function loadDataFromAPI() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/laporan`);
+        if (!response.ok) throw new Error("Gagal mengambil data");
+        laporanList = await response.json();
+
+        document.getElementById('server-status-dot').className = "w-2 h-2 rounded-full bg-green-400 animate-pulse";
+        document.getElementById('server-status-text').innerText = "Server Python API Connected";
+
+        renderDashboardStats();
+        renderTable();
+      } catch (error) {
+        console.error("API Fetch Error:", error);
+        document.getElementById('server-status-dot').className = "w-2 h-2 rounded-full bg-red-400";
+        document.getElementById('server-status-text').innerText = "Server Disconnected";
+      }
+    }
+
+    function renderDashboardStats() {
+      const total = laporanList.length;
+      const menunggu = laporanList.filter(l => l.status_penanganan === 'Menunggu Tinjauan').length;
+      const selesai = laporanList.filter(l => l.status_penanganan === 'Selesai').length;
+
+      document.getElementById('stat-total').innerText = total;
+      document.getElementById('stat-menunggu').innerText = menunggu;
+      document.getElementById('stat-selesai').innerText = selesai;
+
+      let countFisik = 0;
+      let countVerbal = 0;
+      let countCyber = 0;
+
+      laporanList.forEach(l => {
+        const kat = (l.kategori || '').toLowerCase();
+        if (kat.includes('fisik')) countFisik++;
+        if (kat.includes('verbal')) countVerbal++;
+        if (kat.includes('cyber')) countCyber++;
+      });
+
+      const totalKategori = countFisik + countVerbal + countCyber || 1;
+      const pctFisik = Math.round((countFisik / totalKategori) * 100);
+      const pctVerbal = Math.round((countVerbal / totalKategori) * 100);
+      const pctCyber = Math.round((countCyber / totalKategori) * 100);
+
+      document.getElementById('pct-fisik').innerText = `${pctFisik}%`;
+      document.getElementById('pct-verbal').innerText = `${pctVerbal}%`;
+      document.getElementById('pct-cyber').innerText = `${pctCyber}%`;
+
+      document.getElementById('prog-val-fisik').innerText = `${pctFisik}%`;
+      document.getElementById('prog-val-verbal').innerText = `${pctVerbal}%`;
+      document.getElementById('prog-val-cyber').innerText = `${pctCyber}%`;
+
+      document.getElementById('prog-bar-fisik').style.width = `${pctFisik}%`;
+      document.getElementById('prog-bar-verbal').style.width = `${pctVerbal}%`;
+      document.getElementById('prog-bar-cyber').style.width = `${pctCyber}%`;
+
+      updateDonutChart(pctFisik, pctVerbal, pctCyber);
+    }
+
+    function updateDonutChart(fisik, verbal, cyber) {
+      const ctx = document.getElementById('bullyingDonutChart').getContext('2d');
+      if (donutChartInstance) {
+        donutChartInstance.destroy();
+      }
+      donutChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Bullying Fisik', 'Bullying Verbal', 'Cyberbullying'],
+          datasets: [{
+            data: [fisik, verbal, cyber],
+            backgroundColor: ['#ef4444', '#f59e0b', '#a855f7'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          cutout: '70%'
+        }
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tabel-laporan-body');
+      const filter = document.getElementById('filter-status').value;
+      const search = document.getElementById('input-search').value.toLowerCase();
+
+      tbody.innerHTML = '';
+
+      const filtered = laporanList.filter(item => {
+        const matchFilter = (filter === 'Semua') || (item.status_penanganan === filter);
+        const matchSearch = item.kode_tiket.toLowerCase().includes(search) || item.nama_pelapor.toLowerCase().includes(search);
+        return matchFilter && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-gray-400 font-semibold">Tidak ada data laporan.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        let statusBadgeClass = 'bg-amber-100 text-amber-800 border-amber-300';
+        if (item.status_penanganan === 'Menunggu Tinjauan') {
+          statusBadgeClass = 'bg-red-100 text-red-800 border-red-300';
+        } else if (item.status_penanganan === 'Selesai') {
+          statusBadgeClass = 'bg-green-100 text-green-800 border-green-300';
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50 transition';
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-bold text-blue-700">${item.kode_tiket}</td>
+          <td class="px-6 py-4 font-semibold text-gray-800">${item.nama_pelapor}</td>
+          <td class="px-6 py-4 text-gray-600">${item.kelas}</td>
+          <td class="px-6 py-4">
+            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded border border-gray-300 font-medium">${item.kategori}</span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="font-bold px-3 py-1 rounded-full border ${statusBadgeClass}">
+              ${item.status_penanganan}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-gray-500">${item.tanggal}</td>
+          <td class="px-6 py-4 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="openModal('${item.kode_tiket}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-regular fa-pen-to-square"></i> Tinjau
+              </button>
+              <button onclick="openDeleteModal('${item.kode_tiket}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-regular fa-trash-can"></i> Hapus
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // BARU: render galeri bukti foto/video di dalam modal tinjau
+    function renderBuktiPreview(buktiList) {
+      const container = document.getElementById('modal-bukti');
+      container.innerHTML = '';
+
+      if (!Array.isArray(buktiList) || buktiList.length === 0) {
+        container.innerHTML = `<p class="text-gray-400 italic col-span-full">Tidak ada bukti dilampirkan.</p>`;
+        return;
+      }
+
+      buktiList.forEach((dataUrl, idx) => {
+        const isVideo = dataUrl.startsWith('data:video');
+        const wrapper = document.createElement('a');
+        wrapper.href = dataUrl;
+        wrapper.target = '_blank';
+        wrapper.className = 'block border border-gray-200 rounded-lg overflow-hidden hover:opacity-80 transition';
+        wrapper.innerHTML = isVideo
+          ? `<video src="${dataUrl}" class="w-full h-24 object-cover bg-black" muted></video>`
+          : `<img src="${dataUrl}" class="w-full h-24 object-cover" alt="Bukti ${idx + 1}">`;
+        container.appendChild(wrapper);
+      });
+    }
+
+    function openModal(kodeTiket) {
+      activeReviewId = kodeTiket;
+      const item = laporanList.find(l => l.kode_tiket === kodeTiket);
+      if (!item) return;
+
+      document.getElementById('modal-kode').innerText = item.kode_tiket;
+      document.getElementById('modal-tanggal').innerText = item.tanggal;
+      document.getElementById('modal-nama').innerText = item.nama_pelapor;
+      document.getElementById('modal-kelas').innerText = item.kelas;
+      document.getElementById('modal-kategori').innerText = item.kategori;
+      document.getElementById('modal-kronologi').innerText = item.kronologi || '-';
+      renderBuktiPreview(item.bukti); // BARU
+      document.getElementById('modal-input-status').value = item.status_penanganan;
+      document.getElementById('modal-input-pesan').value = item.pesan_balasan || '';
+
+      document.getElementById('modal-tinjau').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-tinjau').classList.add('hidden');
+      activeReviewId = null;
+    }
+
+    async function submitTanggapan() {
+      if (!activeReviewId) return;
+
+      const status = document.getElementById('modal-input-status').value;
+      const pesan = document.getElementById('modal-input-pesan').value;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/update-status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ kode_tiket: activeReviewId, status_penanganan: status, pesan_balasan: pesan })
+        });
+
+        if (response.ok) {
+          closeModal();
+          await loadDataFromAPI();
+        } else {
+          alert("Gagal menyimpan tanggapan.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Gagal memperbarui status ke server.");
+      }
+    }
+
+    function openDeleteModal(kodeTiket) {
+      activeDeleteId = kodeTiket;
+      document.getElementById('delete-target-id').innerText = kodeTiket;
+      document.getElementById('modal-hapus').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      activeDeleteId = null;
+      document.getElementById('modal-hapus').classList.add('hidden');
+    }
+
+    async function executeDeletePermanently() {
+      if (!activeDeleteId) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/laporan/${activeDeleteId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          closeDeleteModal();
+          await loadDataFromAPI();
+        } else {
+          alert("Gagal menghapus data di database.");
+        }
+      } catch (err) {
+        console.error("Delete Error:", err);
+        alert("Gagal menghubungi server database Python.");
+      }
+    }
+  </script>
+</body>
+</html>
